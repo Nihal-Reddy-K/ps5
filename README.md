@@ -1,9 +1,9 @@
 # Phantom Consensus
 
 ## Team Information
-- **Team Name**: [Team Name]
-- **Year**: [Year]
-- **All-Female Team**: [Yes/No]
+- **Team Name**: ByteUs
+- **Year**: 1st
+- **All-Female Team**: No
 
 ## Architecture Overview
 
