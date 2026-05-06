@@ -45,6 +45,15 @@ if st.sidebar.button("Run Consensus Engine", type="primary"):
             # 4. Decisions
             output_data = engine.make_decisions(reps_df, props_df, objs_df, rels_df, alliances)
             
+            # Map IDs to readable names for the frontend
+            rep_name_map = dict(zip(reps_df['id'], reps_df['name'])) if not reps_df.empty else {}
+            prop_name_map = dict(zip(props_df['id'], props_df['title'])) if not props_df.empty else {}
+            
+            alliances = [[rep_name_map.get(n, n) for n in alliance] for alliance in alliances]
+            output_data['alliances'] = alliances
+            output_data['final_agreement']['supporting_reps'] = [rep_name_map.get(n, n) for n in output_data['final_agreement']['supporting_reps']]
+            output_data['final_agreement']['proposals'] = [prop_name_map.get(n, n) for n in output_data['final_agreement']['proposals']]
+            
             st.success("Analysis Complete! Traps Avoided.")
             
             # Display Metrics
@@ -78,13 +87,17 @@ if st.sidebar.button("Run Consensus Engine", type="primary"):
                             for k in range(j+1, len(alliance)):
                                 G.add_edge(alliance[j], alliance[k])
                                 
-                    fig, ax = plt.subplots(figsize=(8, 6))
-                    pos = nx.spring_layout(G, k=0.5, iterations=50)
+                    fig, ax = plt.subplots(figsize=(10, 8))
                     
-                    # Draw nodes and edges
-                    nx.draw_networkx_nodes(G, pos, node_color='skyblue', node_size=2000, edgecolors='black')
+                    # Increase 'k' and iterations to push disconnected alliances further apart
+                    pos = nx.spring_layout(G, k=1.5, iterations=100)
+                    
+                    # Draw edges first
                     nx.draw_networkx_edges(G, pos, edge_color='gray', width=2)
-                    nx.draw_networkx_labels(G, pos, font_size=10, font_weight='bold')
+                    
+                    # Draw labels with a rounded rectangle bounding box
+                    bbox_props = dict(boxstyle="round,pad=0.6", facecolor="skyblue", edgecolor="black", linewidth=1.5)
+                    nx.draw_networkx_labels(G, pos, font_size=11, font_weight='bold', bbox=bbox_props)
                     
                     ax.margins(0.2)
                     plt.axis("off")
